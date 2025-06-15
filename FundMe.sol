@@ -12,12 +12,14 @@ contract FundMe{
 
     using PriceConverter for uint256;
     
-
     address private                                    admin;
     uint256 public                                     minimumUSD = 5e18;
     address[] public                                   funders;
     mapping( address funders => uint256 value)  public addressToAmount;
 
+    constructor (){
+        admin = msg.sender;
+    }
     function fund() public payable  {
         
         require( msg.value.valueConvert() >= minimumUSD, "Missing ETH" );
@@ -25,10 +27,15 @@ contract FundMe{
         addressToAmount[ msg.sender ] += msg.value;
     }
 
-    function withdraw() public {
+    function withdraw() public adminOnly {
 
         for (uint256 i = 0 ; i < funders.length ; i++)
             addressToAmount[ funders[i] ] = 0;
+    }
+
+    modifier adminOnly(){
+        require(admin == msg.sender);
+        _;        
     }
 
 }
