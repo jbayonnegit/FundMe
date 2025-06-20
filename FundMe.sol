@@ -12,8 +12,8 @@ contract FundMe{
 
     using PriceConverter for uint256;
     
-    address private                                    admin;
-    uint256 public                                     minimumUSD = 5e18;
+    address private immutable                          admin;
+    uint256 public constant                            minimumUSD = 5e18;
     address[] public                                   funders;
     mapping( address funders => uint256 value)  public addressToAmount;
 
@@ -31,7 +31,12 @@ contract FundMe{
 
         for (uint256 i = 0 ; i < funders.length ; i++)
             addressToAmount[ funders[i] ] = 0;
+        funders = new address[](0);
     }
+
+    receive() external payable { fund(); }
+
+    fallback() external payable { fund(); }
 
     modifier adminOnly(){
         require(admin == msg.sender);
